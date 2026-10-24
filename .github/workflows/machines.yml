@@ -8,7 +8,7 @@ permissions:
 env:
   OPEN_XY_REPOSITORY: etcetc000/open-xy
   # SDK 1.1 development revision; update deliberately when the API is released.
-  OPEN_XY_REF: d041c63e46007c88d5a6d19050ac135a9f461ba1
+  OPEN_XY_REF: ee14caf1549b046284ded74b3128521d573e65f1
 jobs:
   host:
     runs-on: ubuntu-latest
