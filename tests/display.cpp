@@ -10,6 +10,10 @@ int main() {
     granular::display_reset(state);
     for (auto& slot : input.slots) slot = 1073741824;
     input.elapsed = 16;
+    available = false;
+    granular::display(state, input, frame);
+    if (!opxy::draw::valid(frame)) std::abort();
+    available = true;
     sample.generation = 1; sample.frames = sample.end = 44100;
     sample.rate = 44100; sample.channels = 2; sample.voices = 1;
     for (unsigned bin = 0; bin < opxy::sample_display_bins; ++bin) {

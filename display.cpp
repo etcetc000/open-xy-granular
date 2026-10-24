@@ -78,6 +78,9 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
     const bool waveform = loaded && sample.frames && sample.end > sample.begin;
     for (u32 segment = 0; segment < 3; ++segment) {
         const u32 path = 1 + segment;
+        // Hidden paths still need a valid retained-geometry key, including
+        // the first frame while the background waveform is pending.
+        if (!frame.paths[path].key) frame.paths[path].key = 1;
         if (!waveform) { hide(frame, path); continue; }
         if (snapshot || sample.generation != state.wave_generation ||
             sample.begin != state.wave_begin || sample.end != state.wave_end) {
