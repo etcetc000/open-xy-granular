@@ -41,7 +41,7 @@ The SDK supplies all 256 stock voice handles.
 The screen shows the loaded sample's waveform, position and spray indicators,
 a grain window and simulated grain motion. The SDK prepares a copied waveform
 overview in the background; this instrument draws it with ordinary SVG paths.
-Dots continue while the SDK reports sounding notes, including release tails.
+Dots continue while the SDK reports gated notes, then fade after note-off.
 Their positions and count illustrate the controls, not individual audio grains.
 Presets include Cloud, Freeze, Scanner and Stutter.
 

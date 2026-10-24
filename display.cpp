@@ -1,6 +1,6 @@
 // The grain display: a strip stands for the trimmed sample. The marker is the
 // position control plus the scan drift, the brackets show the spray range, and
-// grains animate while the SDK reports sounding voices. The waveform is a
+// grains animate while the SDK reports gated notes. The waveform is a
 // copied background-worker overview; the GUI never reads PCM or live voices.
 #include "display.h"
 #include <opxy/sample_display.hpp>
@@ -142,7 +142,7 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
     const i32 density_q8 = anchor(density, kDensityQ8, 5);
     i32 interval = (size_ms * unit / 1000) * 256 / density_q8;  // Q10 seconds
     if (interval < 20) interval = 20;
-    if (!input.reduced_motion && sample.voices) {
+    if (!input.reduced_motion && sample.active_notes) {
         state.spawn_due -= elapsed;
         for (u32 n = 0; n < 4 && state.spawn_due <= 0; ++n) {
             state.spawn_due += interval;
