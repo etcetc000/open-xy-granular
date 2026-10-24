@@ -105,6 +105,69 @@ void scan(Voice& voice, const Settings& s, i32 parameter) {
     voice.scan_position = centered > 0 ? add_mod(voice.scan_position, delta, s.length_q12) :
                                          add_mod(voice.scan_position, s.length_q12 - delta, s.length_q12);
 }
+
+// Render one grain up to the next spawn boundary. Channel layout is fixed
+// outside this loop, and grain state stays local until the run completes.
+template <unsigned SourceChannels, unsigned OutputChannels>
+void grain_run(Grain& grain, const Settings& s, const i16* data, i32* output, unsigned count) {
+    if (!grain.window_step) return;
+    u32 position = grain.position, phase = grain.window_phase;
+    const u32 window_step = grain.window_step, step = static_cast<u32>(grain.step);
+    const u32 begin = s.begin << kFraction;
+    const u32 gain_left = grain.gain_left, gain_right = grain.gain_right;
+    if (position - begin > s.limit_q12) { grain.window_step = 0; return; }
+    for (unsigned i = 0; i < count; ++i) {
+        const u32 frame = position >> kFraction;
+        const i32 fraction = static_cast<i32>(position & (kUnit - 1));
+        const i16* at = data + frame * SourceChannels;
+        const i32 a = at[0], b = at[SourceChannels];
+        i32 left = a + (((b - a) * fraction) >> kFraction);
+        i32 right = left;
+        if (SourceChannels == 2) {
+            const i32 c = at[1], d = at[3];
+            right = c + (((d - c) * fraction) >> kFraction);
+        }
+        const i32 weight = static_cast<i32>((granular_window[phase >> 22] * s.gain_q15) >> 15);
+        left = (left * weight) >> 15;
+        right = (right * weight) >> 15;
+        if (OutputChannels == 2) {
+            output[i * 2] += (left * static_cast<i32>(gain_left)) >> 15;
+            output[i * 2 + 1] += (right * static_cast<i32>(gain_right)) >> 15;
+        } else {
+            output[i] += (left + right) >> 1;
+        }
+        position += step;
+        const u32 next_phase = phase + window_step;
+        if (next_phase < phase || position - begin > s.limit_q12) {
+            grain.window_step = 0;
+            break;
+        }
+        phase = next_phase;
+    }
+    grain.position = position;
+    grain.window_phase = phase;
+}
+
+template <unsigned SourceChannels, unsigned OutputChannels>
+void render_runs(Voice& voice, const Settings& s, u32 position, i32* output) {
+    silence(output, OutputChannels);
+    unsigned offset = 0;
+    while (offset < kBlock) {
+        // The original scheduler decrements before testing, so a countdown
+        // of one starts a grain on this sample, not the following sample.
+        if (voice.next > 1) --voice.next;
+        else { spawn(voice, s, position); voice.next = s.interval; }
+        unsigned count = voice.next;
+        if (count > kBlock - offset) count = kBlock - offset;
+        for (unsigned g = 0; g < kGrains; ++g)
+            grain_run<SourceChannels, OutputChannels>(voice.grains[g], s, voice.sample.data,
+                                                      output + offset * OutputChannels, count);
+        voice.next -= count - 1;
+        offset += count;
+    }
+    for (unsigned i = 0; i < kBlock * OutputChannels; ++i)
+        output[i] = saturate16(output[i]) * 32768;
+}
 }
 
 void initialize(Voice& voice, const opxy::SampleView& sample) {
@@ -135,50 +198,12 @@ void render_sample(Voice& voice, const opxy::SampleBlock& block) {
     }
     scan(voice, s, block.parameters[4]);
     const u32 position_q31 = unsigned_q31(block.parameters[0]);
-    const u32 begin_q12 = s.begin << kFraction;
-    const i16* data = sample.data;
-    const u32 source_channels = sample.channels;
-    i32* output = block.output;
-    for (unsigned i = 0; i < kBlock; ++i) {
-        if (voice.next) --voice.next;
-        if (!voice.next) {
-            spawn(voice, s, position_q31);
-            voice.next = s.interval;
-        }
-        i32 left_sum = 0, right_sum = 0;
-        for (unsigned g = 0; g < kGrains; ++g) {
-            Grain& grain = voice.grains[g];
-            if (!grain.window_step) continue;
-            // Live trim edits may exclude a grain retained from the previous block.
-            if (grain.position - begin_q12 > s.limit_q12) { grain.window_step = 0; continue; }
-            const u32 frame = grain.position >> kFraction;
-            const i32 fraction = static_cast<i32>(grain.position & (kUnit - 1));
-            const i16* at = data + frame * source_channels;
-            const i32 a = at[0], b = at[source_channels];
-            i32 left = a + (((b - a) * fraction) >> kFraction);
-            i32 right = left;
-            if (source_channels == 2) {
-                const i32 c = at[1], d = at[3];
-                right = c + (((d - c) * fraction) >> kFraction);
-            }
-            // Window and gain in one Q15 factor (at most 65535), then pan.
-            const i32 weight = static_cast<i32>((granular_window[grain.window_phase >> 22] * s.gain_q15) >> 15);
-            left = (left * weight) >> 15;
-            right = (right * weight) >> 15;
-            if (channels == 2) {
-                left_sum += (left * grain.gain_left) >> 15;
-                right_sum += (right * grain.gain_right) >> 15;
-            } else {
-                left_sum += (left + right) >> 1;
-            }
-            grain.position += static_cast<u32>(grain.step);
-            const u32 next_phase = grain.window_phase + grain.window_step;
-            // The window completing, or leaving the readable region, frees the grain.
-            if (next_phase < grain.window_phase || grain.position - begin_q12 > s.limit_q12) grain.window_step = 0;
-            else grain.window_phase = next_phase;
-        }
-        output[i * channels] = saturate16(left_sum) * 32768;
-        if (channels == 2) output[i * channels + 1] = saturate16(right_sum) * 32768;
+    if (sample.channels == 2) {
+        if (channels == 2) render_runs<2, 2>(voice, s, position_q31, block.output);
+        else render_runs<2, 1>(voice, s, position_q31, block.output);
+    } else {
+        if (channels == 2) render_runs<1, 2>(voice, s, position_q31, block.output);
+        else render_runs<1, 1>(voice, s, position_q31, block.output);
     }
 }
 }

@@ -154,11 +154,11 @@
     "voiceCapacity": 256,
     "stereoOutput": 1,
     "display": {
-      "stateBytes": 380,
+      "stateBytes": 388,
       "stateAlignment": 4,
-      "paths": 1,
+      "paths": 4,
       "points": 64,
-      "nodes": 26,
+      "nodes": 29,
       "palette": 16,
       "texts": 0
     },

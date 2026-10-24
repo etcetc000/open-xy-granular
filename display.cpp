@@ -1,8 +1,9 @@
 // The grain display: a strip stands for the trimmed sample. The marker is the
 // position control plus the scan drift, the brackets show the spray range, and
-// grains appear at the engine's spawn rate for a while after each note start.
-// GUI-side simulation from the same controls: it reads no audio state.
+// grains animate while the SDK reports sounding voices. The waveform is a
+// copied background-worker overview; the GUI never reads PCM or live voices.
 #include "display.h"
+#include <opxy/sample_display.hpp>
 
 namespace granular {
 namespace {
@@ -13,10 +14,9 @@ using namespace opxy::draw;
 constexpr i32 kStripLeft = 40, kStripWidth = 400, kStripMiddle = 120;  // pixels
 constexpr i32 kWindowX = 240, kWindowY = 206;
 constexpr i32 kMaxFrame = 102;        // Q10 seconds: late frames are clamped to 0.1 s
-constexpr i32 kActive = 1536;         // Q10 seconds of grains after a note start
 constexpr i32 kMinLife = 123;         // Q10 seconds: the shortest grain still visible
 constexpr i32 kExpired = 1 << 20;
-constexpr u32 kMarker = 1, kBracketLeft = 2, kBracketRight = 3, kFirstGrain = 4;
+constexpr u32 kMarker = 4, kBracketLeft = 5, kBracketRight = 6, kFirstGrain = 7;
 
 inline u32 random(DisplayState& state) { return state.rng = state.rng * 1664525u + 1013904223u; }
 inline u32 fraction15(i32 q31) { return q31 < 0 ? 0u : static_cast<u32>(q31) >> 16; }  // 0..32767
@@ -31,7 +31,6 @@ const i32 kDensityQ8[5] = {128, 256, 512, 1024, 2048};
 
 inline void clear(DisplayState& state) {
     for (u32 i = 0; i < kDisplayGrains; ++i) state.grains[i].age = kExpired;
-    state.active_age = kExpired;
     state.spawn_due = 0;
 }
 
@@ -41,6 +40,7 @@ void display_reset(DisplayState& state) {
     state.initialized = state.track = state.previous_event = 0;
     state.rng = 0x6d2b79f5u;
     state.scan_offset = 0;
+    state.wave_generation = state.wave_begin = state.wave_end = 0;
     clear(state);
 }
 
@@ -49,17 +49,16 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
     const u32 position = fraction15(input.slots[0]), size = fraction15(input.slots[1]);
     const u32 density = fraction15(input.slots[2]), spray = fraction15(input.slots[3]);
     const u32 spread = fraction15(input.slots[6]);
-    const i32 scan = static_cast<i32>((static_cast<u32>(input.slots[4]) >> 15)) - 32768;  // -16384..16383
+    const i32 scan = static_cast<i32>((static_cast<u32>(input.slots[4]) >> 15)) - 32768;  // -32768..32767
     const bool snapshot = !state.initialized || state.track != input.track;
+    opxy::SampleDisplay sample{};
+    const bool loaded = opxy::sample_display(input.track, sample);
     if (snapshot || input.reduced_motion) {
         clear(state);
         state.scan_offset = 0;
     } else {
         if (input.track < 8 && input.note_serial != state.previous_event) {
-            state.active_age = 0;
             random(state);
-        } else if (state.active_age < kExpired - kMaxFrame) {
-            state.active_age += elapsed;
         }
         // Scan: up to a full strip in five seconds either way; the middle tenth freezes.
         if (scan > 3277 || scan < -3277) {
@@ -73,6 +72,33 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
     state.track = input.track;
     state.previous_event = input.note_serial;
     state.initialized = 1;
+
+    // Three ordinary retained paths cover the strip. Each closed outline
+    // contains 32 upper and 32 lower extrema, scaled within the drawing bounds.
+    const bool waveform = loaded && sample.frames && sample.end > sample.begin;
+    for (u32 segment = 0; segment < 3; ++segment) {
+        const u32 path = 1 + segment;
+        if (!waveform) { hide(frame, path); continue; }
+        if (snapshot || sample.generation != state.wave_generation ||
+            sample.begin != state.wave_begin || sample.end != state.wave_end) {
+            for (u32 point = 0; point < 32; ++point) {
+                const u32 column = segment * 32 + point;
+                const u32 source = sample.begin + (sample.end - sample.begin - 1) * column / 95;
+                u32 bin = source * opxy::sample_display_bins / sample.frames;
+                if (bin >= opxy::sample_display_bins) bin = opxy::sample_display_bins - 1;
+                const i32 x = -kStripWidth * unit / 12 + kStripWidth * unit * static_cast<i32>(point) / (6 * 31);
+                frame.paths[path].points[point] = {x, -(static_cast<i32>(sample.high[bin]) * 25 * unit) / 32768};
+                frame.paths[path].points[63 - point] = {x, -(static_cast<i32>(sample.low[bin]) * 25 * unit) / 32768};
+            }
+            if (!++frame.paths[path].key) ++frame.paths[path].key;
+        }
+        const i32 center = kStripLeft * unit + kStripWidth * unit * static_cast<i32>(2 * segment + 1) / 6;
+        place(frame, path, center, kStripMiddle * unit, 2 * unit, 5, stroke);
+    }
+    if (waveform) {
+        state.wave_generation = sample.generation;
+        state.wave_begin = sample.begin; state.wave_end = sample.end;
+    }
 
     // Marker and brackets along the strip.
     i32 marker = kStripLeft * unit + static_cast<i32>((static_cast<u32>(kStripWidth) * position) >> 15) * unit + state.scan_offset;
@@ -101,7 +127,7 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
             474, 423, 373, 325, 278, 234, 193, 155, 120, 89, 62, 40, 23, 10, 3, 0};
         for (u32 i = 0; i < Frame::point_count; ++i) {
             frame.paths[0].points[i].x = -half_width + (2 * half_width / 63) * static_cast<i32>(i);
-            frame.paths[0].points[i].y = -(window[i] * 24) >> 10;
+            frame.paths[0].points[i].y = -(window[i] * 24);  // Q10: a 24-pixel peak
         }
         frame.paths[0].key = key;
     }
@@ -113,7 +139,7 @@ void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) 
     const i32 density_q8 = anchor(density, kDensityQ8, 5);
     i32 interval = (size_ms * unit / 1000) * 256 / density_q8;  // Q10 seconds
     if (interval < 20) interval = 20;
-    if (!input.reduced_motion && state.active_age < kActive) {
+    if (!input.reduced_motion && sample.voices) {
         state.spawn_due -= elapsed;
         for (u32 n = 0; n < 4 && state.spawn_due <= 0; ++n) {
             state.spawn_due += interval;

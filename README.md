@@ -15,7 +15,7 @@ It uses the standard `sample.cpp`, drawing callbacks, `singleSample` and
 platform code or build scripts. The SDK owns assignment, registration,
 controls, storage and packaging.
 
-This is a development port awaiting hardware evaluation. It is not yet a
+This is a development port undergoing hardware evaluation. It is not yet a
 published catalog release. The SDK branch must land before catalog admission.
 The browser builder can include its artwork and firmware objects; sample
 instruments do not yet have browser audio preview.
@@ -38,10 +38,19 @@ apply. Source sample rates and mono/stereo layouts are respected. Each voice
 has a bounded pool of nine grains, including a slot for scheduling rounding.
 The SDK supplies all 256 stock voice handles.
 
-The screen shows a sample strip, position and spray indicators, a grain window
-and simulated grain motion. It uses controls and note activity, not PCM or live
-audio state, so the drawing is illustrative rather than a waveform monitor.
+The screen shows the loaded sample's waveform, position and spray indicators,
+a grain window and simulated grain motion. The SDK prepares a copied waveform
+overview in the background; this instrument draws it with ordinary SVG paths.
+Dots continue while the SDK reports sounding notes, including release tails.
+Their positions and count illustrate the controls, not individual audio grains.
 Presets include Cloud, Freeze, Scanner and Stutter.
+
+Maximum density processes about eight overlapping grains per sounding note.
+The 256 storage handles do not establish playable polyphony. Audio runs each
+grain in short batches between spawn boundaries to reduce repeated scheduling
+and state traffic; a deterministic sound-reference test guards its arithmetic.
+Device CPU qualification, including the SDK's 24-note planning target, remains
+open. The SDK build and test commands report this cost as unestimated.
 
 ## Check and build
 
