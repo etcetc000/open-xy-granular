@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "sample",
+  "description": "Granular sample player with its own grain display: scattered, pitched grains from a frozen or scanning position.",
+  "identity": {
+    "engine": 36,
+    "page": 84
+  },
+  "presetDefaults": {
+    "amp": {
+      "attack": 2000,
+      "release": 20000
+    }
+  },
+  "sdk": "1.1"
+}

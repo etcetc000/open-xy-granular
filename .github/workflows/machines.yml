@@ -1,0 +1,49 @@
+name: Machine checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  OPEN_XY_REPOSITORY: etcetc000/open-xy
+  # SDK 1.1 development revision; update deliberately when the API is released.
+  OPEN_XY_REF: d041c63e46007c88d5a6d19050ac135a9f461ba1
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: machine
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.OPEN_XY_REPOSITORY }}
+          ref: ${{ env.OPEN_XY_REF }}
+          path: open-xy
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check source and playback
+        run: python open-xy/sdk.py test --machine machine --host-cxx g++
+      - name: Reject private artifacts
+        working-directory: machine
+        run: python ../open-xy/tools/check_private_files.py --tree HEAD
+  firmware:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: machine
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.OPEN_XY_REPOSITORY }}
+          ref: ${{ env.OPEN_XY_REF }}
+          path: open-xy
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch pinned Blackfin tools
+        run: python open-xy/sdk.py toolchain fetch
+      - name: Compile with bundled machines
+        run: python open-xy/sdk.py compile --machine machine --out "${{ runner.temp }}/granular-module"

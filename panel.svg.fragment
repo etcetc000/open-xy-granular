@@ -1,0 +1,49 @@
+<g id="granular_panel">
+    <rect x="0" y="20" width="480" height="200" fill="#000000"/>
+    <!-- The trimmed sample as a strip; grains and the position marker move along it. -->
+    <rect x="40" y="70" width="400" height="100" fill="#000000" stroke="#4B4B4B" stroke-width="1"/>
+    <path d="M40 120 L440 120" fill="none" stroke="#323232" stroke-width="1"/>
+    <path d="M40 60 L40 66 M440 60 L440 66" fill="none" stroke="#4B4B4B" stroke-width="1"/>
+    <path id="granular_node_0" transform="matrix(1 0 0 1 640 120)" d="M-48.00,-0.00 L-46.48,-0.06 L-44.95,-0.24 L-43.43,-0.53 L-41.90,-0.94 L-40.38,-1.46 L-38.86,-2.09 L-37.33,-2.81 L-35.81,-3.62 L-34.29,-4.52 L-32.76,-5.49 L-31.24,-6.53 L-29.71,-7.62 L-28.19,-8.75 L-26.67,-9.92 L-25.14,-11.10 L-23.62,-12.30 L-22.10,-13.49 L-20.57,-14.67 L-19.05,-15.82 L-17.52,-16.94 L-16.00,-18.00 L-14.48,-19.00 L-12.95,-19.94 L-11.43,-20.80 L-9.90,-21.57 L-8.38,-22.24 L-6.86,-22.81 L-5.33,-23.28 L-3.81,-23.63 L-2.29,-23.87 L-0.76,-23.99 L0.76,-23.99 L2.29,-23.87 L3.81,-23.63 L5.33,-23.28 L6.86,-22.81 L8.38,-22.24 L9.90,-21.57 L11.43,-20.80 L12.95,-19.94 L14.48,-19.00 L16.00,-18.00 L17.52,-16.94 L19.05,-15.82 L20.57,-14.67 L22.10,-13.49 L23.62,-12.30 L25.14,-11.10 L26.67,-9.92 L28.19,-8.75 L29.71,-7.62 L31.24,-6.53 L32.76,-5.49 L34.29,-4.52 L35.81,-3.62 L37.33,-2.81 L38.86,-2.09 L40.38,-1.46 L41.90,-0.94 L43.43,-0.53 L44.95,-0.24 L46.48,-0.06 L48.00,-0.00 Z" fill="none" stroke="#9A9A9A" stroke-width="1.2"/>
+    <path id="granular_node_1" transform="matrix(1 0 0 1 640 120)" d="M0 -52 L0 52" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <path id="granular_node_2" transform="matrix(1 0 0 1 640 120)" d="M0 -44 L0 44" fill="none" stroke="#5A5A5A" stroke-width="1"/>
+    <path id="granular_node_3" transform="matrix(1 0 0 1 640 120)" d="M0 -44 L0 44" fill="none" stroke="#5A5A5A" stroke-width="1"/>
+    <circle id="granular_node_4" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_5" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_6" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_7" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_8" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_9" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_10" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_11" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_12" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_13" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_14" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_15" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_16" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_17" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_18" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_19" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_20" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_21" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_22" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_23" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_24" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_node_25" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="5" fill="#040404" stroke="#0C0C0C" stroke-width="1.2"/>
+    <circle id="granular_palette_0" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#101010" stroke="#101010" stroke-width="1.2"/>
+    <circle id="granular_palette_1" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#1E1E1E" stroke="#1E1E1E" stroke-width="1.2"/>
+    <circle id="granular_palette_2" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#2D2D2D" stroke="#2D2D2D" stroke-width="1.2"/>
+    <circle id="granular_palette_3" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#3C3C3C" stroke="#3C3C3C" stroke-width="1.2"/>
+    <circle id="granular_palette_4" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#4B4B4B" stroke="#4B4B4B" stroke-width="1.2"/>
+    <circle id="granular_palette_5" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#5A5A5A" stroke="#5A5A5A" stroke-width="1.2"/>
+    <circle id="granular_palette_6" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#696969" stroke="#696969" stroke-width="1.2"/>
+    <circle id="granular_palette_7" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#787878" stroke="#787878" stroke-width="1.2"/>
+    <circle id="granular_palette_8" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#878787" stroke="#878787" stroke-width="1.2"/>
+    <circle id="granular_palette_9" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#969696" stroke="#969696" stroke-width="1.2"/>
+    <circle id="granular_palette_10" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#A5A5A5" stroke="#A5A5A5" stroke-width="1.2"/>
+    <circle id="granular_palette_11" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#B4B4B4" stroke="#B4B4B4" stroke-width="1.2"/>
+    <circle id="granular_palette_12" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#C3C3C3" stroke="#C3C3C3" stroke-width="1.2"/>
+    <circle id="granular_palette_13" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#D2D2D2" stroke="#D2D2D2" stroke-width="1.2"/>
+    <circle id="granular_palette_14" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#E1E1E1" stroke="#E1E1E1" stroke-width="1.2"/>
+    <circle id="granular_palette_15" transform="matrix(1 0 0 1 640 120)" cx="0" cy="0" r="1" fill="#F0F0F0" stroke="#F0F0F0" stroke-width="1.2"/>
+</g>

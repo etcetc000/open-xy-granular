@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "id": "granular",
+  "name": "Granular",
+  "parameters": [
+    {
+      "id": "position",
+      "label": "position",
+      "default": 0.12,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent"
+    },
+    {
+      "id": "size",
+      "label": "size",
+      "default": 0.5,
+      "mapping": {
+        "kind": "anchors",
+        "values": [
+          10,
+          25,
+          50,
+          100,
+          200,
+          350,
+          500
+        ]
+      },
+      "display": "duration"
+    },
+    {
+      "id": "density",
+      "label": "density",
+      "default": 0.5,
+      "mapping": {
+        "kind": "anchors",
+        "values": [
+          0.5,
+          1,
+          2,
+          4,
+          8
+        ]
+      },
+      "display": "ratio"
+    },
+    {
+      "id": "spray",
+      "label": "spray",
+      "default": 0.1,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 2000
+      },
+      "display": "duration"
+    },
+    {
+      "id": "scan",
+      "label": "scan",
+      "default": 0.5,
+      "mapping": {
+        "kind": "linear",
+        "minimum": -2,
+        "maximum": 2
+      },
+      "display": "bipolar",
+      "control": 0
+    },
+    {
+      "id": "tune",
+      "label": "tune",
+      "default": 0.5,
+      "mapping": {
+        "kind": "linear",
+        "minimum": -12,
+        "maximum": 12
+      },
+      "display": "semitones",
+      "control": 1
+    },
+    {
+      "id": "spread",
+      "label": "spread",
+      "default": 0.3,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 2
+    },
+    {
+      "id": "volume",
+      "label": "volume",
+      "default": 1,
+      "mapping": {
+        "kind": "linear",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "display": "percent",
+      "control": 3
+    }
+  ],
+  "presets": {
+    "Cloud": {
+      "position": 0.3,
+      "size": 0.7,
+      "density": 0.75,
+      "spray": 0.25,
+      "scan": 0.5,
+      "tune": 0.5,
+      "spread": 0.8,
+      "volume": 1
+    },
+    "Freeze": {
+      "position": 0.12,
+      "size": 0.5,
+      "density": 0.5,
+      "spray": 0.02,
+      "scan": 0.5,
+      "tune": 0.5,
+      "spread": 0.2,
+      "volume": 1
+    },
+    "Scanner": {
+      "position": 0,
+      "size": 0.45,
+      "density": 0.6,
+      "spray": 0.05,
+      "scan": 0.75,
+      "tune": 0.5,
+      "spread": 0.4,
+      "volume": 1
+    },
+    "Stutter": {
+      "position": 0.2,
+      "size": 0.1,
+      "density": 0.25,
+      "spray": 0,
+      "scan": 0.5,
+      "tune": 0.5,
+      "spread": 0,
+      "volume": 1
+    }
+  },
+  "resources": {
+    "voiceCapacity": 256,
+    "stereoOutput": 1,
+    "display": {
+      "stateBytes": 380,
+      "stateAlignment": 4,
+      "paths": 1,
+      "points": 64,
+      "nodes": 26,
+      "palette": 16,
+      "texts": 0
+    },
+    "singleSample": 1
+  }
+}
