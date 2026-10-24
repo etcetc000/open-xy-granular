@@ -116,36 +116,47 @@ void grain_run(Grain& grain, const Settings& s, const i16* data, i32* output, un
     const u32 begin = s.begin << kFraction;
     const u32 gain_left = grain.gain_left, gain_right = grain.gain_right;
     if (position - begin > s.limit_q12) { grain.window_step = 0; return; }
+    // Prove the entire run readable before entering its hot loop. Only the
+    // last run of a grain needs division; ordinary runs use two products.
+    // count <= 64, window_step <= UINT32_MAX / 441, |step| <= 2^20,
+    // so both products fit in 32 bits. The final readable sample still plays.
+    bool finished = false;
+    const u32 phase_room = 0xffffffffu - phase;
+    if (phase_room < window_step * count) {
+        count = phase_room / window_step + 1;
+        finished = true;
+    }
+    const u32 magnitude = grain.step < 0 ? 0u - step : step;
+    const u32 distance = grain.step < 0 ? position - begin : s.limit_q12 - (position - begin);
+    if (distance < magnitude * count) {
+        count = distance / magnitude + 1;
+        finished = true;
+    }
     for (unsigned i = 0; i < count; ++i) {
         const u32 frame = position >> kFraction;
         const i32 fraction = static_cast<i32>(position & (kUnit - 1));
         const i16* at = data + frame * SourceChannels;
+        const i32 weight = static_cast<i32>((granular_window[phase >> 22] * s.gain_q15) >> 15);
         const i32 a = at[0], b = at[SourceChannels];
-        i32 left = a + (((b - a) * fraction) >> kFraction);
+        const i32 left = ((a + (((b - a) * fraction) >> kFraction)) * weight) >> 15;
+        if (OutputChannels == 2)
+            output[i * 2] += (left * static_cast<i32>(gain_left)) >> 15;
         i32 right = left;
         if (SourceChannels == 2) {
             const i32 c = at[1], d = at[3];
-            right = c + (((d - c) * fraction) >> kFraction);
+            right = ((c + (((d - c) * fraction) >> kFraction)) * weight) >> 15;
         }
-        const i32 weight = static_cast<i32>((granular_window[phase >> 22] * s.gain_q15) >> 15);
-        left = (left * weight) >> 15;
-        right = (right * weight) >> 15;
         if (OutputChannels == 2) {
-            output[i * 2] += (left * static_cast<i32>(gain_left)) >> 15;
             output[i * 2 + 1] += (right * static_cast<i32>(gain_right)) >> 15;
         } else {
             output[i] += (left + right) >> 1;
         }
         position += step;
-        const u32 next_phase = phase + window_step;
-        if (next_phase < phase || position - begin > s.limit_q12) {
-            grain.window_step = 0;
-            break;
-        }
-        phase = next_phase;
+        phase += window_step;
     }
     grain.position = position;
     grain.window_phase = phase;
+    if (finished) grain.window_step = 0;
 }
 
 template <unsigned SourceChannels, unsigned OutputChannels>
