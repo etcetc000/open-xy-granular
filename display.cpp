@@ -37,14 +37,14 @@ inline void clear(DisplayState& state) {
 
 }
 
-inline void display_reset(DisplayState& state) {
+void display_reset(DisplayState& state) {
     state.initialized = state.track = state.previous_event = 0;
     state.rng = 0x6d2b79f5u;
     state.scan_offset = 0;
     clear(state);
 }
 
-inline void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) {
+void display(DisplayState& state, const opxy::draw::Input& input, Frame& frame) {
     const i32 elapsed = clamp(input.elapsed, 0, kMaxFrame);
     const u32 position = fraction15(input.slots[0]), size = fraction15(input.slots[1]);
     const u32 density = fraction15(input.slots[2]), spray = fraction15(input.slots[3]);

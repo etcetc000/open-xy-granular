@@ -1,4 +1,5 @@
-Granular was originally submitted by galfaroth in Open-XY commit
+The original Granular engine and display are by **veff**, submitted through
+galfaroth/open-xy in commit
 [9e9f87b811c869049a0732806521a50f48a41e34](https://github.com/galfaroth/open-xy/commit/9e9f87b811c869049a0732806521a50f48a41e34).
 The original commit credits Claude Fable 5.1 as co-author.
 

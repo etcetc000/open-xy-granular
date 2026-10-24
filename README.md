@@ -2,7 +2,8 @@
 
 A standalone sample instrument for the OP-XY: a cloud of windowed grains
 from a frozen or scanning position, with stereo spread and a custom display.
-Based on [galfaroth's original submission](https://github.com/galfaroth/open-xy/commit/9e9f87b811c869049a0732806521a50f48a41e34);
+Original Granular engine and display by **veff**, from
+[the galfaroth submission](https://github.com/galfaroth/open-xy/commit/9e9f87b811c869049a0732806521a50f48a41e34);
 see [NOTICE.md](NOTICE.md) and [LICENSE](LICENSE).
 
 ## SDK requirement
