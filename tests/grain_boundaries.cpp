@@ -1,5 +1,6 @@
 // Compare batched grain bounds against the original scalar stop conditions.
 #include <cstdlib>
+#include <initializer_list>
 #include "sample.cpp"
 using namespace granular;
 static void check(bool condition) { if (!condition) std::abort(); }
@@ -13,10 +14,11 @@ static void exercise() {
     const u32 phases[] = {0, 0xffffffffu, 0xffffffffu - 9739154u, 0xffffff00u};
     const u32 windows[] = {0xffffffffu / 441, 0xffffffffu / 22050};
     for (auto count : counts) for (auto position : positions) for (auto step : steps)
-        for (auto phase : phases) for (auto window : windows) {
+        for (auto phase : phases) for (auto window : windows)
+            for (u32 gain : {1u, 32767u, 65535u}) {
             Settings settings{};
             settings.begin = 2; settings.limit_q12 = 256 * 4096;
-            settings.gain_q15 = 32767;
+            settings.gain_q15 = gain;
             Grain grain{position + 8192, step, phase, window, 12345, 32767};
             Grain reference = grain;
             i32 actual[130], expected[130];
@@ -28,7 +30,7 @@ static void exercise() {
                 const i16* at = pcm + frame * Source;
                 i32 left = at[0] + (((at[Source] - at[0]) * fraction) >> 12);
                 i32 right = Source == 2 ? at[1] + (((at[3] - at[1]) * fraction) >> 12) : left;
-                const i32 weight = (granular_window[reference.window_phase >> 22] * settings.gain_q15) >> 15;
+                const i32 weight = ((granular_window[reference.window_phase >> 22] >> 16) * settings.gain_q15) >> 15;
                 left = (left * weight) >> 15; right = (right * weight) >> 15;
                 if (Output == 2) {
                     expected[1 + i * 2] += (left * reference.gain_left) >> 15;

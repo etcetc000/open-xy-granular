@@ -27,7 +27,7 @@ inline i32 anchor(u32 f15, const i32* values, u32 count) {
     return values[index] + ((values[index + 1] - values[index]) * static_cast<i32>(part) >> 15);
 }
 const i32 kSizeMs[7] = {10, 25, 50, 100, 200, 350, 500};
-const i32 kDensityQ8[5] = {128, 256, 512, 1024, 2048};
+const i32 kDensityQ8[5] = {128, 256, 512, 1024, 1536};
 
 inline void clear(DisplayState& state) {
     for (u32 i = 0; i < kDisplayGrains; ++i) state.grains[i].age = kExpired;

@@ -49,16 +49,23 @@ int main() {
         render_sample(voice, block);
         for (unsigned i = 1; i < 129; ++i) check(guarded[i] == 0, "Empty and tiny regions must be silent");
     }
-    // Maximum density must actually sustain eight simultaneous grains.
+    // Maximum density must sustain six grains, with no rounding overflow slot.
     block.region.end = 44100; parameters[2] = 2147483647;
-    start(voice); unsigned maximum = 0;
-    for (unsigned b = 0; b < 200; ++b) {
-        render_sample(voice, block);
-        unsigned count = 0;
-        for (const auto& grain : voice.grains) count += grain.window_step != 0;
-        if (count > maximum) maximum = count;
+    for (opxy::i32 size : {0, 357913941, 1073741824, 2147483647}) {
+        parameters[1] = size;
+        const auto configured = settings(voice, block);
+        check(configured.interval >= 74, "Minimum spawn spacing must bound block work");
+        check(configured.interval * kGrains >= configured.size + 1,
+              "Six slots must cover the complete window");
+        start(voice); unsigned maximum = 0;
+        for (unsigned b = 0; b < 800; ++b) {
+            render_sample(voice, block);
+            unsigned count = 0;
+            for (const auto& grain : voice.grains) count += grain.window_step != 0;
+            if (count > maximum) maximum = count;
+        }
+        check(maximum == 6, "Maximum density must sustain exactly six grains");
     }
-    check(maximum >= 8, "Density eight was limited by the grain pool");
     sample.channels = 1; sample.rate = 48000;
     initialize(voice, sample); start(voice); block.output_channels = 1;
     guarded[65] = 123456;

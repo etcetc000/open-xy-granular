@@ -1,4 +1,5 @@
 #include "granular.h"
+#include <opxy/q31.hpp>
 
 namespace granular {
 namespace {
@@ -63,7 +64,9 @@ Settings settings(const Voice& voice, const opxy::SampleBlock& block) {
     s.reverse = block.region.reverse;
     s.size = anchor(unsigned_q31(block.parameters[1]), kSizeFrames, 7);
     const u32 density_q8 = anchor(unsigned_q31(block.parameters[2]), kDensityQ8, 5);
-    s.interval = (s.size << 8) / density_q8;
+    // The Q32 window plays size + 1 samples. Round spacing upward so six
+    // grains sustain maximum density without an extra rounding slot.
+    s.interval = (((s.size + 1) << 8) + density_q8 - 1) / density_q8;
     if (s.interval < kMinInterval) s.interval = kMinInterval;
     u32 spray = mul_shift(unsigned_q31(block.parameters[3]), 2u * sample.rate, 31);
     if (spray > s.length / 2) spray = s.length / 2;
@@ -114,7 +117,10 @@ void grain_run(Grain& grain, const Settings& s, const i16* data, i32* output, un
     u32 position = grain.position, phase = grain.window_phase;
     const u32 window_step = grain.window_step, step = static_cast<u32>(grain.step);
     const u32 begin = s.begin << kFraction;
-    const u32 gain_left = grain.gain_left, gain_right = grain.gain_right;
+    // Q31 pan coefficients let the SDK use its exact fractional multiply.
+    // These retain the original Q15 truncation without platform code here.
+    const i32 gain_left = static_cast<i32>(grain.gain_left) * 65536;
+    const i32 gain_right = static_cast<i32>(grain.gain_right) * 65536;
     if (position - begin > s.limit_q12) { grain.window_step = 0; return; }
     // Prove the entire run readable before entering its hot loop. Only the
     // last run of a grain needs division; ordinary runs use two products.
@@ -136,18 +142,18 @@ void grain_run(Grain& grain, const Settings& s, const i16* data, i32* output, un
         const u32 frame = position >> kFraction;
         const i32 fraction = static_cast<i32>(position & (kUnit - 1));
         const i16* at = data + frame * SourceChannels;
-        const i32 weight = static_cast<i32>((granular_window[phase >> 22] * s.gain_q15) >> 15);
+        const i32 weight = opxy::q31::multiply(granular_window[phase >> 22], static_cast<i32>(s.gain_q15));
         const i32 a = at[0], b = at[SourceChannels];
         const i32 left = ((a + (((b - a) * fraction) >> kFraction)) * weight) >> 15;
         if (OutputChannels == 2)
-            output[i * 2] += (left * static_cast<i32>(gain_left)) >> 15;
+            output[i * 2] += opxy::q31::multiply(left, gain_left);
         i32 right = left;
         if (SourceChannels == 2) {
             const i32 c = at[1], d = at[3];
             right = ((c + (((d - c) * fraction) >> kFraction)) * weight) >> 15;
         }
         if (OutputChannels == 2) {
-            output[i * 2 + 1] += (right * static_cast<i32>(gain_right)) >> 15;
+            output[i * 2 + 1] += opxy::q31::multiply(right, gain_right);
         } else {
             output[i] += (left + right) >> 1;
         }

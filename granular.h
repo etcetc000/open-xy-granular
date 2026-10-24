@@ -11,7 +11,7 @@ using opxy::i32;
 using opxy::u16;
 using opxy::u32;
 
-constexpr unsigned kGrains = 9;           // density up to 8, plus one for integer scheduling/window rounding
+constexpr unsigned kGrains = 6;           // hard bound on simultaneous grains per note
 constexpr unsigned kBlock = 64;
 constexpr unsigned kFraction = 12;        // position: sample frames in Q20.12
 constexpr u32 kUnit = 1u << kFraction;
@@ -42,7 +42,7 @@ struct Voice {
 // Grain length in output samples and density (grains per grain length, Q8)
 // for the evenly spaced anchors in definition.json.
 static const u32 kSizeFrames[7] = {441, 1102, 2205, 4410, 8820, 15435, 22050};
-static const u32 kDensityQ8[5] = {128, 256, 512, 1024, 2048};
+static const u32 kDensityQ8[5] = {128, 256, 512, 1024, 1536};
 
 // (a * b) >> shift for the full 64-bit product, in 16-bit limbs: the module
 // links no 64-bit runtime. shift is 0..63.

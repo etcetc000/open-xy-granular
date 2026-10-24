@@ -29,13 +29,14 @@ fine adjustments to the shown parameter.
 | --- | --- | --- |
 | 1 | Position in the trimmed sample | Scan, backward/frozen/forward; the middle tenth freezes |
 | 2 | Grain size, 10-500 ms | Tune, -12 to +12 semitones |
-| 3 | Density, 0.5-8 grains per grain length | Stereo spread |
+| 3 | Density, 0.5-6 grains per grain length | Stereo spread |
 | 4 | Spray, up to 2 seconds | Volume |
 
 The sample button assigns one sample across the track's keyboard. Notes play
 chromatically around middle C; saved region tuning, trim, direction and level
 apply. Source sample rates and mono/stereo layouts are respected. Each voice
-has a bounded pool of nine grains, including a slot for scheduling rounding.
+has a hard limit of six simultaneous grains. Spawn spacing rounds upward to
+include the full window, so maximum density needs no extra rounding slot.
 The SDK supplies all 256 stock voice handles.
 
 The screen shows the loaded sample's waveform, position and spray indicators,
@@ -45,7 +46,7 @@ Dots continue while the SDK reports gated notes, then fade after note-off.
 Their positions and count illustrate the controls, not individual audio grains.
 Presets include Cloud, Freeze, Scanner and Stutter.
 
-Maximum density processes about eight overlapping grains per sounding note.
+Maximum density processes at most six overlapping grains per sounding note.
 The 256 storage handles do not establish playable polyphony. Audio runs each
 grain in short batches between spawn boundaries to reduce repeated scheduling
 and state traffic; a deterministic sound-reference test guards its arithmetic.
