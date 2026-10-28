@@ -8,8 +8,9 @@ see [NOTICE.md](NOTICE.md) and [LICENSE](LICENSE).
 
 ## SDK requirement
 
-Targets Open-XY SDK **1.1**, currently on
+Targets Open-XY SDK **1.5**, currently on
 [`sdk/sample-machine-pages`](https://github.com/etcetc000/open-xy/tree/sdk/sample-machine-pages).
+Firmware builds target OP-XY OS **1.2.1**.
 It uses the standard `sample.cpp`, drawing callbacks, `singleSample` and
 `stereoOutput` declarations. It contains no firmware addresses, assembly,
 platform code or build scripts. The SDK owns assignment, registration,
@@ -55,7 +56,7 @@ open. The SDK build and test commands report this cost as unestimated.
 
 ## Check and build
 
-From an SDK 1.1 checkout, with this repository beside it:
+From an SDK 1.5 checkout, with this repository beside it:
 
 ```sh
 python sdk.py test --machine ../open-xy-granular --host-cxx clang++

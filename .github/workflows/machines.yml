@@ -7,8 +7,8 @@ permissions:
   contents: read
 env:
   OPEN_XY_REPOSITORY: etcetc000/open-xy
-  # SDK 1.1 development revision; update deliberately when the API is released.
-  OPEN_XY_REF: 6b911591f5663e9cf133253b06b30dfe57a8618c
+  # SDK 1.5 / OS 1.2.1 development revision; update deliberately when the API is released.
+  OPEN_XY_REF: e23d8bf390740ca004ea62a2bbbb4c5d5f328136
 jobs:
   host:
     runs-on: ubuntu-latest
@@ -45,5 +45,5 @@ jobs:
           python-version: '3.11'
       - name: Fetch pinned Blackfin tools
         run: python open-xy/sdk.py toolchain fetch
-      - name: Compile with bundled machines
+      - name: Compile Granular for OS 1.2.1
         run: python open-xy/sdk.py compile --machine machine --out "${{ runner.temp }}/granular-module"
